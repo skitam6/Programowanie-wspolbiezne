@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="Bilard.data/Bilard.data.csproj" />
-  <Project Path="Bilard.logic/Bilard.logic.csproj" />
-  <Project Path="Bilard.Model/Bilard.Model.csproj" />
-  <Project Path="Bilard.view/Bilard.view.csproj" />
-  <Project Path="Bilard.ViewModel/Bilard.ViewModel.csproj" />
-</Solution>
