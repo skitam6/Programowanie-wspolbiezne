@@ -18,20 +18,27 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
 {
   public class MainWindowViewModel : ViewModelBase, IDisposable
   {
-        public int BallsCount { get; set; } = 5; // Domyślna liczba kul
+        private int _ballsCount = 5;
+        public int BallsCount
+        {
+            get => _ballsCount;
+            set
+            {
+                _ballsCount = value;
+                RaisePropertyChanged();
+            }
+        }
         public ICommand StartCommand { get; }
-        public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
         #region ctor
 
         public MainWindowViewModel() : this(null)
     { }
 
-    internal MainWindowViewModel(ModelAbstractApi modelLayerAPI)
-    {
-      ModelLayer = modelLayerAPI == null ? ModelAbstractApi.CreateModel() : modelLayerAPI;
-      Observer = ModelLayer.Subscribe<ModelIBall>(x => Balls.Add(x));
-
-      StartCommand = new RelayCommand(() => Start(BallsCount));
+        internal MainWindowViewModel(ModelAbstractApi modelLayerAPI)
+        {
+            ModelLayer = modelLayerAPI == null ? ModelAbstractApi.CreateModel() : modelLayerAPI;
+            Observer = ModelLayer.Subscribe<ModelIBall>(x => Balls.Add(x));
+            StartCommand = new RelayCommand(() => Start(BallsCount));
         }
 
     #endregion ctor
@@ -45,6 +52,8 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
       ModelLayer.Start(numberOfBalls);
       Observer.Dispose();
     }
+
+    public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
 
     #endregion public API
 
