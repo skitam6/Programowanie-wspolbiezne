@@ -20,12 +20,12 @@ namespace TP.ConcurrentProgramming.PresentationView
   {
     public MainWindow()
     {
-      Random random = new Random();
+      //Random random = new Random();
       InitializeComponent();
-      MainWindowViewModel viewModel = (MainWindowViewModel)DataContext;
-      double screenWidth = SystemParameters.PrimaryScreenWidth;
-      double screenHeight = SystemParameters.PrimaryScreenHeight;
-      viewModel.Start(random.Next(5, 10));
+      //MainWindowViewModel viewModel = (MainWindowViewModel)DataContext;
+      //double screenWidth = SystemParameters.PrimaryScreenWidth;
+      //double screenHeight = SystemParameters.PrimaryScreenHeight;
+      //viewModel.Start(random.Next(5, 10));
     }
 
     /// <summary>

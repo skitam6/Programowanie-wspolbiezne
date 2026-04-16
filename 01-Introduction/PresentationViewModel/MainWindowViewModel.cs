@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using TP.ConcurrentProgramming.Presentation.Model;
 using TP.ConcurrentProgramming.Presentation.ViewModel.MVVMLight;
 using ModelIBall = TP.ConcurrentProgramming.Presentation.Model.IBall;
@@ -17,16 +18,21 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
 {
   public class MainWindowViewModel : ViewModelBase, IDisposable
   {
-    #region ctor
+        public int BallsCount { get; set; } = 5; // Domyślna liczba kul
+        public ICommand StartCommand { get; }
+        public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
+        #region ctor
 
-    public MainWindowViewModel() : this(null)
+        public MainWindowViewModel() : this(null)
     { }
 
     internal MainWindowViewModel(ModelAbstractApi modelLayerAPI)
     {
       ModelLayer = modelLayerAPI == null ? ModelAbstractApi.CreateModel() : modelLayerAPI;
       Observer = ModelLayer.Subscribe<ModelIBall>(x => Balls.Add(x));
-    }
+
+      StartCommand = new RelayCommand(() => Start(BallsCount));
+        }
 
     #endregion ctor
 
@@ -39,8 +45,6 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
       ModelLayer.Start(numberOfBalls);
       Observer.Dispose();
     }
-
-    public ObservableCollection<ModelIBall> Balls { get; } = new ObservableCollection<ModelIBall>();
 
     #endregion public API
 

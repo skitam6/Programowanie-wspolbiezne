@@ -9,6 +9,14 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Liczba kul: " VerticalAlignment="Center" />
+            <TextBox Text="{Binding BallsCount}" Width="50" Margin="5" />
+            <Button Content="Start" Command="{Binding StartCommand}" Width="75" Margin="5" />
+
+        </StackPanel>
+        
     <Border BorderThickness="4" BorderBrush="Green" Height="420" Width="400">
         <ItemsControl ItemsSource="{Binding Balls}">
             <ItemsControl.ItemsPanel>
@@ -29,4 +37,5 @@
             </ItemsControl.ItemContainerStyle>
         </ItemsControl>
     </Border>
+   </StackPanel>
 </Window>
