@@ -1,49 +1,59 @@
-﻿//____________________________________________________________________________________________________________________________________
-//
-//  Copyright (C) 2024, Mariusz Postol LODZ POLAND.
-//
-//  To be in touch join the community by pressing the `Watch` button and get started commenting using the discussion panel at
-//
-//  https://github.com/mpostol/TP/discussions/182
-//
-//_____________________________________________________________________________________________________________________________________
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace TP.ConcurrentProgramming.Data
 {
   internal class Ball : IBall
   {
     #region ctor
+        public double Mass { get; init; }
+        public double Radius { get; init; }
+        public IVector Position {  get; private set; }
+        public IVector Velocity { get; set; }
 
-    internal Ball(Vector initialPosition, Vector initialVelocity)
-    {
-      Position = initialPosition;
-      Velocity = initialVelocity;
-    }
+        public event EventHandler<IVector>? NewPositionNotification;
+        private CancellationTokenSource _cancellationTokenSource;
 
-    #endregion ctor
+        internal Ball(Vector initialPosition, Vector initialVelocity, double mass, double radius)
+        {
+            Position = initialPosition;
+            Velocity = initialVelocity;
+            Mass = mass;
+            Radius = radius;
+            _cancellationTokenSource = new CancellationTokenSource();
 
-    #region IBall
+            Task.Run(() => MoveLoop(_cancellationTokenSource.Token));
+        }
+        private async Task MoveLoop(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                Position = new Vector(Position.x + Velocity.x, Position.y + Velocity.y);
+                NewPositionNotification?.Invoke(this, Position);
 
-    public event EventHandler<IVector>? NewPositionNotification;
+                // Opóźnienie pętli (~60 FPS)
+                await Task.Delay(16, token);
+            }
+        }
+        public void Dispose()
+        {
+            _cancellationTokenSource.Cancel();
+        }
 
-    public IVector Velocity { get; set; }
+        #endregion ctor
+
+        #region IBall
+
 
     #endregion IBall
 
     #region private
-
-    private Vector Position;
 
     private void RaiseNewPositionChangeNotification()
     {
       NewPositionNotification?.Invoke(this, Position);
     }
 
-    internal void Move()
-     {
-        Position = new Vector(Position.x + Velocity.x, Position.y + Velocity.y);
-            RaiseNewPositionChangeNotification();
-     }
 
         #endregion private
     }

@@ -1,12 +1,4 @@
-﻿//____________________________________________________________________________________________________________________________________
-//
-//  Copyright (C) 2024, Mariusz Postol LODZ POLAND.
-//
-//  To be in touch join the community by pressing the `Watch` button and get started commenting using the discussion panel at
-//
-//  https://github.com/mpostol/TP/discussions/182
-//
-//_____________________________________________________________________________________________________________________________________
+﻿
 
 using System;
 using System.Diagnostics;
@@ -19,7 +11,7 @@ namespace TP.ConcurrentProgramming.Data
 
     public DataImplementation()
     {
-        MoveTimer = new Timer(Move, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(16));
+        
     }
 
     #endregion ctor
@@ -35,11 +27,13 @@ namespace TP.ConcurrentProgramming.Data
       Random random = new Random();
       for (int i = 0; i < numberOfBalls; i++)
       {
-        Vector startingPosition = new(random.Next(20, 350), random.Next(20, 350));
-        Vector initialVelocity = new((random.NextDouble() - 0.5) * 5, (random.NextDouble() - 0.5) * 5);
-        Ball newBall = new(startingPosition, initialVelocity);
-        upperLayerHandler(startingPosition, newBall);
-        BallsList.Add(newBall);
+            double radius = random.Next(5, 20);
+                double mass = radius;
+            Vector startingPosition = new(random.Next(20, 350), random.Next(20, 350));
+            Vector initialVelocity = new((random.NextDouble() - 0.5) * 5, (random.NextDouble() - 0.5) * 5);
+            Ball newBall = new(startingPosition, initialVelocity, mass, radius);
+            upperLayerHandler(startingPosition, newBall);
+            BallsList.Add(newBall);
       }
     }
 
@@ -53,7 +47,10 @@ namespace TP.ConcurrentProgramming.Data
       {
         if (disposing)
         {
-          MoveTimer.Dispose();
+          foreach (var ball in BallsList)
+          {
+            ball.Dispose();
+          }
           BallsList.Clear();
         }
         Disposed = true;
@@ -75,16 +72,8 @@ namespace TP.ConcurrentProgramming.Data
 
     //private bool disposedValue;
     private bool Disposed = false;
-
-    private readonly Timer MoveTimer;
     private Random RandomGenerator = new();
     private List<Ball> BallsList = [];
-
-    private void Move(object? x)
-    {
-      foreach (Ball item in BallsList)
-        item.Move();
-    }
 
     #endregion private
 
