@@ -11,6 +11,8 @@
 using System.Diagnostics;
 using UnderneathLayerAPI = TP.ConcurrentProgramming.Data.DataAbstractAPI;
 
+using System.Collections.Generic;
+
 namespace TP.ConcurrentProgramming.BusinessLogic
 {
   internal class BusinessLogicImplementation : BusinessLogicAbstractAPI
@@ -25,9 +27,12 @@ namespace TP.ConcurrentProgramming.BusinessLogic
       layerBellow = underneathLayer == null ? UnderneathLayerAPI.GetDataLayer() : underneathLayer;
     }
 
-    #endregion ctor
+        #endregion ctor
 
     #region BusinessLogicAbstractAPI
+
+    private readonly List<Ball> _logicBalls = new List<Ball>();
+    private readonly object _collisionLock = new object();
 
     public override void Dispose()
     {
@@ -37,21 +42,25 @@ namespace TP.ConcurrentProgramming.BusinessLogic
       Disposed = true;
     }
 
-    public override void Start(int numberOfBalls, Action<IPosition, IBall> upperLayerHandler)
-    {
-      if (Disposed)
-        throw new ObjectDisposedException(nameof(BusinessLogicImplementation));
-      if (upperLayerHandler == null)
-        throw new ArgumentNullException(nameof(upperLayerHandler));
-        layerBellow.Start(numberOfBalls, (startingPosition, databall) =>
-        upperLayerHandler(new Position(startingPosition.x, startingPosition.y), new Ball(databall, GetDimensions)));
+        public override void Start(int numberOfBalls, Action<IPosition, IBall> upperLayerHandler)
+        {
+            if (Disposed) throw new ObjectDisposedException(nameof(BusinessLogicImplementation));
+            if (upperLayerHandler == null) throw new ArgumentNullException(nameof(upperLayerHandler));
+
+            layerBellow.Start(numberOfBalls, (startingPosition, databall) =>
+            {
+                Ball newLogicBall = new Ball(databall, GetDimensions, _logicBalls, _collisionLock);
+                _logicBalls.Add(newLogicBall); 
+
+                upperLayerHandler(new Position(startingPosition.x, startingPosition.y), newLogicBall);
+            });
         }
 
-    #endregion BusinessLogicAbstractAPI
+        #endregion BusinessLogicAbstractAPI
 
-    #region private
+        #region private
 
-    private bool Disposed = false;
+        private bool Disposed = false;
 
     private readonly UnderneathLayerAPI layerBellow;
 

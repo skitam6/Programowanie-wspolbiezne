@@ -5,11 +5,14 @@ using TP.ConcurrentProgramming.Presentation.Model;
 using TP.ConcurrentProgramming.Presentation.ViewModel.MVVMLight;
 using ModelIBall = TP.ConcurrentProgramming.Presentation.Model.IBall;
 
+using System.Threading;
+
 namespace TP.ConcurrentProgramming.Presentation.ViewModel
 {
   public class MainWindowViewModel : ViewModelBase, IDisposable
   {
         private int _ballsCount = 5;
+        private readonly SynchronizationContext _syncContext;
         public int BallsCount
         {
             get => _ballsCount;
@@ -22,21 +25,22 @@ namespace TP.ConcurrentProgramming.Presentation.ViewModel
         public ICommand StartCommand { get; }
         #region ctor
 
-        public MainWindowViewModel() : this(null)
-    { }
+        public MainWindowViewModel() : this(null) { }
 
         internal MainWindowViewModel(ModelAbstractApi modelLayerAPI)
         {
+            _syncContext = SynchronizationContext.Current ?? new SynchronizationContext();
             ModelLayer = modelLayerAPI == null ? ModelAbstractApi.CreateModel() : modelLayerAPI;
-            Observer = ModelLayer.Subscribe<ModelIBall>(x => Balls.Add(x));
+
+            Observer = ModelLayer.Subscribe<ModelIBall>(x => _syncContext.Send(_ => Balls.Add(x), null));
             StartCommand = new RelayCommand(() => Start(BallsCount));
         }
 
-    #endregion ctor
+        #endregion ctor
 
-    #region public API
+        #region public API
 
-    public void Start(int numberOfBalls)
+        public void Start(int numberOfBalls)
     {
       if (Disposed)
         throw new ObjectDisposedException(nameof(MainWindowViewModel));
