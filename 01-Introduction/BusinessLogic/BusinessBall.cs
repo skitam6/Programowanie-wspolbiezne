@@ -17,36 +17,41 @@ namespace TP.ConcurrentProgramming.BusinessLogic
             _dimensions = dimensions;
             _allBalls = allBalls;
             _collisionLock = collisionLock;
-            _dataBall.NewPositionNotification += RaisePositionChangeEvent;
+
+            _dataBall.PositionChanged += RaisePositionChangeEvent;
         }
 
         #region IBall
 
-        public event EventHandler<IPosition>? NewPositionNotification;
+        public event EventHandler? PositionChanged;
 
         #endregion IBall
+        public double Mass => _dataBall.Mass;
+        public double Radius => _dataBall.Radius;
+        public IPosition Position => new Position(_dataBall.Position.x, _dataBall.Position.y);
 
         #region private
 
-        private void RaisePositionChangeEvent(object? sender, Data.IVector e)
+        private void RaisePositionChangeEvent(object? sender, EventArgs e)
         {
             lock (_collisionLock)
             {
-                double diameter = _dimensions.BallDimension;
-                double radius = diameter / 2;
+                double diameter = _dataBall.Radius * 2;
+                double radius = _dataBall.Radius;
 
-                double velX = _dataBall.Velocity.x;
-                double velY = _dataBall.Velocity.y;
+                var currentPos = _dataBall.Position;
+                var currentVel = _dataBall.Velocity;
+
+                double velX = currentVel.x;
+                double velY = currentVel.y;
                 bool velocityChanged = false;
 
-                if ((e.x <= 0 && velX < 0) || (e.x + diameter >= _dimensions.TableWidth && velX > 0))
+                if ((currentPos.x <= 0 && velX < 0) || (currentPos.x + diameter >= _dimensions.TableWidth && velX > 0))
                 {
                     velX = -velX;
                     velocityChanged = true;
                 }
-
-
-                if ((e.y <= 0 && velY < 0) || (e.y + diameter >= _dimensions.TableHeight && velY > 0))
+                if ((currentPos.y <= 0 && velY < 0) || (currentPos.y + diameter >= _dimensions.TableHeight && velY > 0))
                 {
                     velY = -velY;
                     velocityChanged = true;
@@ -56,44 +61,38 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 {
                     if (otherBall == this) continue;
 
-                    double dx = (e.x + radius) - (otherBall._dataBall.Position.x + radius);
-                    double dy = (e.y + radius) - (otherBall._dataBall.Position.y + radius);
+                    var otherPos = otherBall._dataBall.Position;
+                    double dx = (currentPos.x + radius) - (otherPos.x + otherBall.Radius);
+                    double dy = (currentPos.y + radius) - (otherPos.y + otherBall.Radius);
                     double distance = Math.Sqrt(dx * dx + dy * dy);
 
-                    if (distance <= diameter)
+                    if (distance <= (radius + otherBall.Radius))
                     {
-                        double otherVelX = otherBall._dataBall.Velocity.x;
-                        double otherVelY = otherBall._dataBall.Velocity.y;
-
-                        double relVelX = velX - otherVelX;
-                        double relVelY = velY - otherVelY;
+                        var otherVel = otherBall._dataBall.Velocity;
+                        double relVelX = velX - otherVel.x;
+                        double relVelY = velY - otherVel.y;
 
                         if ((relVelX * dx + relVelY * dy) < 0)
                         {
-
                             double nx = dx / distance;
                             double ny = dy / distance;
-                            double tx = -ny;
-                            double ty = nx;
 
-                            double dpNorm1 = velX * nx + velY * ny;
-                            double dpTan1 = velX * tx + velY * ty;
+                            double v1n = velX * nx + velY * ny;
+                            double v2n = otherVel.x * nx + otherVel.y * ny;
+                            double v1t = velX * -ny + velY * nx;
+                            double v2t = otherVel.x * -ny + otherVel.y * nx;
 
-                            double dpNorm2 = otherVelX * nx + otherVelY * ny;
-                            double dpTan2 = otherVelX * tx + otherVelY * ty;
+                            double v1n_new = v2n;
+                            double v2n_new = v1n;
 
-                            double dpNorm1_new = dpNorm2;
-                            double dpNorm2_new = dpNorm1;
-
-                            velX = (dpNorm1_new * nx) + (dpTan1 * tx);
-                            velY = (dpNorm1_new * ny) + (dpTan1 * ty);
+                            velX = v1n_new * nx + v1t * -ny;
+                            velY = v1n_new * ny + v1t * nx;
                             velocityChanged = true;
 
-                            double newOtherVelX = (dpNorm2_new * nx) + (dpTan2 * tx);
-                            double newOtherVelY = (dpNorm2_new * ny) + (dpTan2 * ty);
+                            double newOtherVelX = v2n_new * nx + v2t * -ny;
+                            double newOtherVelY = v2n_new * ny + v2t * nx;
 
                             otherBall._dataBall.Velocity = new Vector(newOtherVelX, newOtherVelY);
-
                         }
                     }
                 }
@@ -104,7 +103,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                 }
             }
 
-            NewPositionNotification?.Invoke(this, new Position(e.x, e.y));
+            PositionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion private

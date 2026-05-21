@@ -8,16 +8,30 @@ namespace TP.ConcurrentProgramming.Data
     #region ctor
         public double Mass { get; init; }
         public double Radius { get; init; }
-        public IVector Position {  get; private set; }
-        public IVector Velocity { get; set; }
 
-        public event EventHandler<IVector>? NewPositionNotification;
+        private IVector _position;
+        private IVector _velocity;
+        private readonly object _lock = new object();
+
+        public IVector Position
+        {
+            get { lock (_lock) return _position; }
+            private set { lock (_lock) _position = value; }
+        }
+
+        public IVector Velocity
+        {
+            get { lock (_lock) return _velocity; }
+            set { lock (_lock) _velocity = value; }
+        }
+
+        public event EventHandler? PositionChanged;
         private CancellationTokenSource _cancellationTokenSource;
 
         internal Ball(Vector initialPosition, Vector initialVelocity, double mass, double radius)
         {
-            Position = initialPosition;
-            Velocity = initialVelocity;
+            _position = initialPosition;
+            _velocity = initialVelocity;
             Mass = mass;
             Radius = radius;
             _cancellationTokenSource = new CancellationTokenSource();
@@ -28,11 +42,28 @@ namespace TP.ConcurrentProgramming.Data
         {
             while (!token.IsCancellationRequested)
             {
-                Position = new Vector(Position.x + Velocity.x, Position.y + Velocity.y);
-                NewPositionNotification?.Invoke(this, Position);
+                int currentDelay;
 
-                // Opóźnienie pętli (~60 FPS)
-                await Task.Delay(16, token);
+                lock (_lock)
+                {
+                    _position = new Vector(_position.x + _velocity.x, _position.y + _velocity.y);
+
+                    double speed = Math.Sqrt(_velocity.x * _velocity.x + _velocity.y * _velocity.y);
+
+
+                    if (speed > 0.1)
+                    {
+                        currentDelay = (int)Math.Clamp(50.0 / speed, 10.0, 24.0);
+                    }
+                    else
+                    {
+                        currentDelay = 24;
+                    }
+                }
+
+                PositionChanged?.Invoke(this, EventArgs.Empty);
+
+                await Task.Delay(currentDelay, token);
             }
         }
         public void Dispose()
@@ -48,13 +79,6 @@ namespace TP.ConcurrentProgramming.Data
     #endregion IBall
 
     #region private
-
-    private void RaiseNewPositionChangeNotification()
-    {
-      NewPositionNotification?.Invoke(this, Position);
-    }
-
-
         #endregion private
     }
 }

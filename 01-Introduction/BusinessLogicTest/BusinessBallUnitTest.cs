@@ -27,7 +27,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             Ball newInstance = new(dataBallFixture, BusinessLogicAbstractAPI.GetDimensions, dummyList, dummyLock);
 
             int numberOfCallBackCalled = 0;
-            newInstance.NewPositionNotification += (sender, position) => { Assert.IsNotNull(sender); Assert.IsNotNull(position); numberOfCallBackCalled++; };
+            newInstance.PositionChanged += (sender, e) => { Assert.IsNotNull(sender); numberOfCallBackCalled++; };
             dataBallFixture.Move();
             Assert.AreEqual<int>(1, numberOfCallBackCalled);
         }
@@ -41,11 +41,11 @@ namespace TP.ConcurrentProgramming.BusinessLogic.Test
             public Data.IVector Position { get; } = new VectorFixture(0.0, 0.0);
             public Data.IVector Velocity { get; set; } = new VectorFixture(1.0, 1.0);
 
-            public event EventHandler<Data.IVector>? NewPositionNotification;
+            public event EventHandler? PositionChanged;
 
             internal void Move()
             {
-                NewPositionNotification?.Invoke(this, new VectorFixture(0.0, 0.0));
+                PositionChanged?.Invoke(this, EventArgs.Empty);
             }
 
             public void Dispose() { }

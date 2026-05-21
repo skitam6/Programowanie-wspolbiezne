@@ -23,7 +23,7 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
     #region Layer API
 
-    public static readonly Dimensions GetDimensions = new(20.0, 412.0, 392.0);
+    public static readonly Dimensions GetDimensions = new( 392.0 , 412.0);
 
     public abstract void Start(int numberOfBalls, Action<IPosition, IBall> upperLayerHandler);
 
@@ -50,16 +50,19 @@ namespace TP.ConcurrentProgramming.BusinessLogic
   /// <remarks>
   /// Must be abstract
   /// </remarks>
-  public record Dimensions(double BallDimension, double TableHeight, double TableWidth);
+  public record Dimensions(double TableWidth, double TableHeight);
 
   public interface IPosition
   {
-    double x { get; init; }
-    double y { get; init; }
+    double x { get; }
+    double y { get; }
   }
 
   public interface IBall 
   {
-    event EventHandler<IPosition> NewPositionNotification;
+    double Mass { get; }
+    double Radius { get; }
+    IPosition Position { get; }
+    event EventHandler PositionChanged;
   }
 }
