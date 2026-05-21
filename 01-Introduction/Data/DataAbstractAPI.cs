@@ -12,6 +12,9 @@ namespace TP.ConcurrentProgramming.Data
 {
   public abstract class DataAbstractAPI : IDisposable
   {
+
+   public const double BallMass = 10.0;
+   public const double BallRadius = 10.0;
     #region Layer Factory
 
     public static DataAbstractAPI GetDataLayer()

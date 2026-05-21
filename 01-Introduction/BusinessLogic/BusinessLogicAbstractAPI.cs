@@ -12,6 +12,9 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 {
   public abstract class BusinessLogicAbstractAPI : IDisposable
   {
+
+   public const double BallMass = TP.ConcurrentProgramming.Data.DataAbstractAPI.BallMass;
+   public const double BallRadius = TP.ConcurrentProgramming.Data.DataAbstractAPI.BallRadius;
     #region Layer Factory
 
     public static BusinessLogicAbstractAPI GetBusinessLogicLayer()

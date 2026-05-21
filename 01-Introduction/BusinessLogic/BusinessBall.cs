@@ -34,8 +34,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         {
             lock (_collisionLock)
             {
-                const double radius = 10.0;
-                const double diameter = 20.0;
+                double radius = BusinessLogicAbstractAPI.BallRadius;
+                double diameter = radius * 2;
 
                 var currentPos = _dataBall.Position;
                 var currentVel = _dataBall.Velocity;

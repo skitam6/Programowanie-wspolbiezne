@@ -35,7 +35,7 @@ namespace TP.ConcurrentProgramming.Presentation.Model
 
         #region IBall
 
-        public double Diameter => 20.0;
+        public double Diameter => TP.ConcurrentProgramming.BusinessLogic.BusinessLogicAbstractAPI.BallRadius * 2;
 
         public double Top
         {
