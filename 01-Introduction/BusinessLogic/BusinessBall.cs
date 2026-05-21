@@ -26,8 +26,6 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         public event EventHandler? PositionChanged;
 
         #endregion IBall
-        public double Mass => _dataBall.Mass;
-        public double Radius => _dataBall.Radius;
         public IPosition Position => new Position(_dataBall.Position.x, _dataBall.Position.y);
 
         #region private
@@ -36,8 +34,8 @@ namespace TP.ConcurrentProgramming.BusinessLogic
         {
             lock (_collisionLock)
             {
-                double diameter = _dataBall.Radius * 2;
-                double radius = _dataBall.Radius;
+                const double radius = 10.0;
+                const double diameter = 20.0;
 
                 var currentPos = _dataBall.Position;
                 var currentVel = _dataBall.Velocity;
@@ -62,11 +60,12 @@ namespace TP.ConcurrentProgramming.BusinessLogic
                     if (otherBall == this) continue;
 
                     var otherPos = otherBall._dataBall.Position;
-                    double dx = (currentPos.x + radius) - (otherPos.x + otherBall.Radius);
-                    double dy = (currentPos.y + radius) - (otherPos.y + otherBall.Radius);
+
+                    double dx = (currentPos.x + radius) - (otherPos.x + radius);
+                    double dy = (currentPos.y + radius) - (otherPos.y + radius);
                     double distance = Math.Sqrt(dx * dx + dy * dy);
 
-                    if (distance <= (radius + otherBall.Radius))
+                    if (distance <= diameter)
                     {
                         var otherVel = otherBall._dataBall.Velocity;
                         double relVelX = velX - otherVel.x;

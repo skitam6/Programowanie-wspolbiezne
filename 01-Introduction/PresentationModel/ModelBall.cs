@@ -29,14 +29,13 @@ namespace TP.ConcurrentProgramming.Presentation.Model
             _underneathBall = underneathBall;
             TopBackingField = _underneathBall.Position.y;
             LeftBackingField = _underneathBall.Position.x;
-            Diameter = _underneathBall.Radius * 2;
 
             _underneathBall.PositionChanged += OnPositionChanged;
         }
 
         #region IBall
 
-        public double Diameter { get; init; }
+        public double Diameter => 20.0;
 
         public double Top
         {

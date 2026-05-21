@@ -60,8 +60,6 @@ namespace TP.ConcurrentProgramming.BusinessLogic
 
   public interface IBall 
   {
-    double Mass { get; }
-    double Radius { get; }
     IPosition Position { get; }
     event EventHandler PositionChanged;
   }

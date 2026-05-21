@@ -55,8 +55,6 @@ namespace TP.ConcurrentProgramming.Data
 
   public interface IBall : IDisposable
   {
-        double Mass { get; }
-        double Radius { get; }
         IVector Position { get; }
         IVector Velocity { get; set; }
         event EventHandler PositionChanged;

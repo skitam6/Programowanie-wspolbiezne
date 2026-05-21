@@ -19,11 +19,10 @@ namespace TP.ConcurrentProgramming.Data.Test
         public void ConstructorTestMethod()
         {
             Vector testinVector = new Vector(0.0, 0.0);
-            Ball newInstance = new(testinVector, testinVector, 10.0, 10.0);
+            Ball newInstance = new(testinVector, testinVector);
 
             Assert.IsNotNull(newInstance);
-            Assert.AreEqual(10.0, newInstance.Mass);
-            Assert.AreEqual(10.0, newInstance.Radius);
+
         }
     }
 }

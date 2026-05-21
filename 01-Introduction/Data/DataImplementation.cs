@@ -27,13 +27,11 @@ namespace TP.ConcurrentProgramming.Data
             Random random = new Random();
             for (int i = 0; i < numberOfBalls; i++)
             {
-                double mass = 10.0;
-                double radius = 10.0;
 
                 Vector startingPosition = new Vector(random.Next(20, 350), random.Next(20, 350));
                 Vector initialVelocity = new Vector((random.NextDouble() - 0.5) * 5, (random.NextDouble() - 0.5) * 5);
 
-                Ball newBall = new Ball(startingPosition, initialVelocity, mass, radius);
+                Ball newBall = new Ball(startingPosition, initialVelocity);
                 upperLayerHandler(startingPosition, newBall);
                 BallsList.Add(newBall);
             }

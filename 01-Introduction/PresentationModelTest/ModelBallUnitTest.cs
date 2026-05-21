@@ -46,8 +46,6 @@ namespace TP.ConcurrentProgramming.Presentation.Model.Test
 
         private class BusinessLogicIBallFixture : BusinessLogic.IBall
         {
-            public double Mass { get; } = 10.0;
-            public double Radius { get; } = 10.0;
             public IPosition Position { get; } = new PositionFixture();
 
             public event EventHandler? PositionChanged; 

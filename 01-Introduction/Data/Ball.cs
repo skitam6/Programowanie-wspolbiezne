@@ -28,12 +28,10 @@ namespace TP.ConcurrentProgramming.Data
         public event EventHandler? PositionChanged;
         private CancellationTokenSource _cancellationTokenSource;
 
-        internal Ball(Vector initialPosition, Vector initialVelocity, double mass, double radius)
+        internal Ball(Vector initialPosition, Vector initialVelocity)
         {
             _position = initialPosition;
             _velocity = initialVelocity;
-            Mass = mass;
-            Radius = radius;
             _cancellationTokenSource = new CancellationTokenSource();
 
             Task.Run(() => MoveLoop(_cancellationTokenSource.Token));
