@@ -6,9 +6,6 @@ namespace TP.ConcurrentProgramming.Data
   internal class Ball : IBall
   {
     #region ctor
-        public double Mass { get; init; }
-        public double Radius { get; init; }
-
         private IVector _position;
         private IVector _velocity;
         private readonly object _lock = new object();
