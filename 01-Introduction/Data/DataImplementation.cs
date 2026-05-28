@@ -24,6 +24,7 @@ namespace TP.ConcurrentProgramming.Data
             if (Disposed) throw new ObjectDisposedException(nameof(DataImplementation));
             if (upperLayerHandler == null) throw new ArgumentNullException(nameof(upperLayerHandler));
 
+            _logger = new Logger();
             Random random = new Random();
             for (int i = 0; i < numberOfBalls; i++)
             {
@@ -31,7 +32,7 @@ namespace TP.ConcurrentProgramming.Data
                 Vector startingPosition = new Vector(random.Next(20, 350), random.Next(20, 350));
                 Vector initialVelocity = new Vector((random.NextDouble() - 0.5) * 5, (random.NextDouble() - 0.5) * 5);
 
-                Ball newBall = new Ball(startingPosition, initialVelocity);
+                Ball newBall = new(startingPosition, initialVelocity, _logger.LogBallState);
                 upperLayerHandler(startingPosition, newBall);
                 BallsList.Add(newBall);
             }
@@ -69,6 +70,7 @@ namespace TP.ConcurrentProgramming.Data
     private bool Disposed = false;
     private List<Ball> BallsList = new List<Ball>();
     private Random RandomGenerator = new();
+    private Logger _logger;
 
 
     #endregion private

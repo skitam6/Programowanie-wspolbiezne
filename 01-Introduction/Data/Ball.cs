@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace TP.ConcurrentProgramming.Data
 {
@@ -9,6 +10,7 @@ namespace TP.ConcurrentProgramming.Data
         private IVector _position;
         private IVector _velocity;
         private readonly object _lock = new object();
+        private readonly Action<double, double, double, double> _logAction;
 
         public IVector Position
         {
@@ -25,26 +27,38 @@ namespace TP.ConcurrentProgramming.Data
         public event EventHandler? PositionChanged;
         private CancellationTokenSource _cancellationTokenSource;
 
-        internal Ball(Vector initialPosition, Vector initialVelocity)
+        internal Ball(Vector initialPosition, Vector initialVelocity, Action<double, double, double, double> logAction)
         {
             _position = initialPosition;
             _velocity = initialVelocity;
+            _logAction = logAction;
             _cancellationTokenSource = new CancellationTokenSource();
 
             Task.Run(() => MoveLoop(_cancellationTokenSource.Token));
         }
         private async Task MoveLoop(CancellationToken token)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             while (!token.IsCancellationRequested)
             {
                 int currentDelay;
 
+                stopwatch.Stop();
+                long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+                stopwatch.Restart();
+
+                double timeMultiplier = elapsedMilliseconds > 0 ? (double)elapsedMilliseconds / 16.0 : 1.0;
+
                 lock (_lock)
                 {
-                    _position = new Vector(_position.x + _velocity.x, _position.y + _velocity.y);
+                    _position = new Vector(
+                        _position.x + (_velocity.x * timeMultiplier),
+                        _position.y + (_velocity.y * timeMultiplier)
+                    );
 
                     double speed = Math.Sqrt(_velocity.x * _velocity.x + _velocity.y * _velocity.y);
-
 
                     if (speed > 0.1)
                     {
@@ -57,6 +71,8 @@ namespace TP.ConcurrentProgramming.Data
                 }
 
                 PositionChanged?.Invoke(this, EventArgs.Empty);
+
+                _logAction?.Invoke(Position.x, Position.y, Velocity.x, Velocity.y);
 
                 await Task.Delay(currentDelay, token);
             }
