@@ -9,6 +9,7 @@
 //_____________________________________________________________________________________________________________________________________
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Runtime.CompilerServices;
 
 namespace TP.ConcurrentProgramming.Data.Test
 {
@@ -19,7 +20,10 @@ namespace TP.ConcurrentProgramming.Data.Test
         public void ConstructorTestMethod()
         {
             Vector testinVector = new Vector(0.0, 0.0);
-            Ball newInstance = new(testinVector, testinVector);
+
+            Action<double, double, double, double> LogAction = (x, y, vx, vy) => { };
+
+            Ball newInstance = new(testinVector, testinVector, LogAction);
 
             Assert.IsNotNull(newInstance);
 
