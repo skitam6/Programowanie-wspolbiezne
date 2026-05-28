@@ -45,7 +45,7 @@ namespace TP.ConcurrentProgramming.Data
 
         private async Task WriteLoop()
         {
-            using StreamWriter sw = new StreamWriter(_filePath, append: true);
+            using StreamWriter sw = new StreamWriter(_filePath, append: true, encoding: System.Text.Encoding.ASCII);
 
             var options = new JsonSerializerOptions { WriteIndented = true };
 
